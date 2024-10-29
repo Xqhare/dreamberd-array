@@ -51,6 +51,28 @@ for entry in list.iter() {
 }
 ```
 
+```rust
+let input: Vec<usize> = vec![1, 2, 3];
+let mut list = List::new();
+for i in input {
+    list.push(i);
+}
+assert_eq!(list[-1.0], 1);
+assert_eq!(list[0.0], 2);
+assert_eq!(list[1.0], 3);
+assert_eq!(list[0.5], 3);
+assert_eq!(list[-0.5], 2);
+
+list.insert(-0.5, 42);
+assert_eq!(list[-0.5], 42);
+list.insert(1.5, 69);
+assert_eq!(list[1.5], 69);
+let truth = vec![3, 69, 2, 42,  1];
+for (i, element) in list.into_iter().enumerate() {
+    assert_eq!(element, truth[i]);
+}
+```
+
 For more examples, check out the documentation of the `List` struct and its methods.
 */
 
@@ -319,8 +341,12 @@ impl<T> List<T> {
         } else if index - count > 0.0 {
             return None;
         }
+        let mut index2 = index;
+        if index.fract() != 0.0 {
+            index2 += 1.0;
+        }
         while let Some(node) = cur_link {
-            if count <= index {
+            if count <= index2 {
                 return Some(&node.elem);
             }
             count -= 1.0;
@@ -355,8 +381,12 @@ impl<T> List<T> {
         } else if index - count > 0.0 {
             return None;
         }
+        let mut index2 = index;
+        if index.fract() != 0.0 {
+            index2 += 1.0;
+        }
         while let Some(node) = cur_link {
-            if count <= index {
+            if count <= index2 {
                 return Some(&mut node.elem);
             }
             count -= 1.0;
@@ -396,8 +426,12 @@ impl<T> List<T> {
         } else if index - count > 0.0 {
             return;
         }
+        let mut index2 = index;
+        if index.fract() != 0.0 {
+            index2 += 1.0;
+        }
         while let Some(node) = cur_link {
-            if count <= index {
+            if count <= index2 {
                 let new_node = Box::new(Node {
                     elem,
                     next: node.next.take(),
