@@ -74,3 +74,52 @@ fn iter_mut() {
     assert_eq!(iter.next(), Some(&mut 2));
     assert_eq!(iter.next(), Some(&mut 1));
 }
+
+#[test]
+fn len() {
+    let mut list = List::new();
+    list.push(1); list.push(2); list.push(3);
+
+    assert_eq!(list.len(), 3);
+}
+
+#[test]
+fn get() {
+    let mut list = List::new();
+    list.push(1); list.push(2); list.push(3);
+    println!("{:?}", list);
+
+    assert_eq!(list.get(-1.0), Some(&1));
+    assert_eq!(list.get(0.0), Some(&2));
+    assert_eq!(list.get(1.0), Some(&3));
+    assert_eq!(list.get(2.0), None);
+}
+
+#[test]
+fn get_mut() {
+    let mut list = List::new();
+    list.push(1); list.push(2); list.push(3);
+
+    list.get_mut(0.0).map(|value| {
+        *value = 42
+    });
+
+    assert_eq!(list.get_mut(-1.0), Some(&mut 1));
+    assert_eq!(list.get_mut(0.0), Some(&mut 42));
+    assert_eq!(list.get_mut(1.0), Some(&mut 3));
+    assert_eq!(list.get_mut(2.0), None);
+}
+
+#[test]
+fn insert() {
+    let mut list = List::new();
+    list.push(1); list.push(2); list.push(3);
+
+    list.insert(-1.0, 42);
+    assert_eq!(list.get(-1.0), Some(&42));
+    list.insert(0.0, 43);
+    assert_eq!(list.get(0.0), Some(&43));
+    list.insert(1.0, 44);
+    assert_eq!(list.get(1.0), Some(&44));
+}
+
