@@ -60,6 +60,16 @@ impl<T> List<T> {
     pub fn iter_mut(&mut self) -> IterMut<T> {
         IterMut { next: self.head.as_deref_mut() }
     }
+
+    pub fn len(&self) -> usize {
+        let mut count = 0;
+        let mut cur_link = self.head.as_deref();
+        while let Some(node) = cur_link {
+            count += 1;
+            cur_link = node.next.as_deref();
+        }
+        count
+    }
 }
 
 impl<T> Drop for List<T> {
