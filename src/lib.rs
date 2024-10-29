@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 pub struct List<T> {
     head: Link<T>,
 }
@@ -70,6 +72,69 @@ impl<T> List<T> {
         }
         count
     }
+
+    pub fn get(&self, index: f32) -> Option<&T> {
+        let mut count = -1.0;
+        let mut cur_link = self.head.as_deref();
+        while let Some(node) = cur_link {
+            if count == index || count > index {
+                return Some(&node.elem);
+            }
+            count += 1.0;
+            cur_link = node.next.as_deref();
+        }
+        None
+    }
+
+    pub fn get_mut(&mut self, index: f32) -> Option<&mut T> {
+        let mut count = -1.0;
+        let mut cur_link = self.head.as_deref_mut();
+        while let Some(node) = cur_link {
+            if count == index || count > index {
+                return Some(&mut node.elem);
+            }
+            count += 1.0;
+            cur_link = node.next.as_deref_mut();
+        }
+        None
+    }
+
+    pub fn insert(&mut self, index: f32, elem: T) {
+        let mut count = -1.0;
+        let mut cur_link = self.head.as_deref_mut();
+        while let Some(node) = cur_link {
+            if count == index || count > index {
+                let new_node = Box::new(Node {
+                    elem,
+                    next: node.next.take(),
+                });
+                node.next = Some(new_node);
+                return;
+            }
+            count += 1.0;
+            cur_link = node.next.as_deref_mut();
+        }
+    }
+}
+
+impl<T: Clone> List<T> {
+    pub fn remove(&mut self, index: f32) -> Option<T> {
+        let mut count = -1.0;
+        let mut cur_link = self.head.as_deref_mut();
+        let mut new_list = List { head: None };
+        let mut out = None;
+        while let Some(node) = cur_link {
+            if count == index || count > index {
+                new_list.head = node.next.take();
+                out = Some(node.elem.clone());
+            } else {
+                new_list.push(node.elem.clone());
+            }
+            count += 1.0;
+            cur_link = node.next.as_deref_mut();
+        }
+        out
+    }
 }
 
 impl<T> Drop for List<T> {
@@ -105,6 +170,19 @@ impl<'a, T> Iterator for IterMut<'a, T> {
             self.next = node.next.as_deref_mut();
             &mut node.elem
         })
+    }
+}
+
+impl<T> Index<f32> for List<T> {
+    type Output = T;
+    fn index(&self, index: f32) -> &Self::Output {
+        &self.get(index).unwrap()
+    }
+}
+
+impl<T> IndexMut<f32> for List<T> {
+    fn index_mut(&mut self, index: f32) -> &mut Self::Output {
+        self.get_mut(index).unwrap()
     }
 }
 
